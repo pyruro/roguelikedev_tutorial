@@ -1,11 +1,11 @@
-from typing import Optional
+from typing import Optional  # optional denotes something that could be set to None
 
 import tcod.event
 
 from actions import Action, EscapeAction, MovementAction
 
 
-class EventHandler(tcod.event.EventDispatch[Action]):
+class EventHandler(tcod.event.EventDispatch[Action]):  # subclass of tcod's EventDispatch
     def ev_quit(self, event: tcod.event.Quit) -> Optional[Action]:
         raise SystemExit()
 
