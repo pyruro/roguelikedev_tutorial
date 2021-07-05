@@ -27,4 +27,4 @@ class EventHandler(tcod.event.EventDispatch[Action]):  # subclass of tcod's Even
             action = EscapeAction()
 
         # No valid key was pressed
-        return action
+        return action  # I think this is key later, the game don't advance to the next "turn" if no button is pressed

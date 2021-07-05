@@ -1,0 +1,87 @@
+Week 1.
+-------
+### RELATED TOPICS WEEK 1: The game loop ###
+=== A turn based game loop === https://journal.stuffwithstuff.com/2014/07/15/a-turn-based-game-loop/
+- The game engine should be strictly separated from the user interface.
+- Monsters and player-controlled characters should be treated uniformly.
+- The game loop job is to iterate over the actors in the level and tell each to take its turn.
+- Separate deciding what behavior to perform from executing the behavior. This is called the "Command pattern"
+  http://gameprogrammingpatterns.com/command.html
+  With this each action is isolated and decoupled. It's easy to add new actions to the game.
+- We want actors to move at different speeds (if not, you could never outrun or be outrun).
+  A "faster" actor gets to take turns more frequently than other actors. (check Angband energy based system)
+  """
+  It works like this: Every actor has an energy level. Each time the game loop reaches an actor,
+  it grants it a bit of energy. When the actor’s energy reaches a certain threshold, it has enough to
+  take a turn and perform an action. Otherwise, the game loop just moves on to the next actor. It may
+  take several cranks through the game loop before an actor accumulates enough juice to actually take
+  a turn. (And, in fact, for all but the fastest actors, it does.)
+
+  When the actor performs an action, that burns energy, and they’re back in the “waiting to get enough
+  energy to go” state.
+  """
+  The cool thing about this system is that applies to all actors. Some game engines update the hero
+  separately from monsters in the main game loop, but that makes speed much trickier to handle.
+  By treating the hero as just another actor, the hero can be both slower and faster than other monsters automatically.
+
+- Validating actions so that when the player runs into a wall the turn doesn't count.
+  """
+  What I’m describing are game mechanics, and game mechanics belong in the engine. In particular,
+  most of them belong in actions. We’ll put the solution to this problem in there too. When an action
+  is processed, we’ll let it return a value indicating success. If it fails, the game loop considers it to
+  have never happened.
+  """
+  - To improve this --> Do what I mean, not what I said:
+    Doors for example
+    """
+    When an action is validating itself, it can fail outright like we saw, but it can also respond with
+    an alternate action. It lets the action say, “no, you really mean this”.
+    Since the perform() method on Action can return success, failure, or another action, we’ll make a little
+    class to wrap that up. {{ class ActionResult }}
+    When an action is executing, it returns ActionResult.SUCCESS to say everything went fine,
+    ActionResult.FAILURE to say nothing happened, or it can return an ActionResult with .alternate
+    pointing to a new action to perform instead.
+
+    We do this in a loop because an alternate may itself return an alternate.
+    This is useful for "use item", "walk into door", "melee attacks", "rest".
+    """
+
+### RELATED TOPICS WEEK 1: Map generation ###
+Links:
+http://www.roguebasin.com/index.php?title=Articles#Map
+https://www.gridsagegames.com/blog/2014/06/procedural-map-generation/
+https://www.rockpapershotgun.com/how-do-roguelikes-generate-levels
+---
+=== Procedural Map Generation === https://www.gridsagegames.com/blog/2014/06/procedural-map-generation/
+Methods:
+- BDP Trees can be used to create some of the simplest and most immediately recognizable
+  roguelike maps--rectangular rooms attached to one another by corridors.
+  demo: https://eskerda.com/bsp-dungeon-generation/
+- Tunneling Algorithms: Tunneling algorithms dig corridors and rooms out of solid terrain, much as a real
+  dungeon architect might. Except for the often useless or redundant pathways…
+  - Drunkard’s Walk, a highly-randomized tunneling algorithm, is useful for
+    creating cave-like environments with a mix of open and narrow areas.
+- Cellular automata are great for digging natural-looking cave systems. Unlike other methods you have to find a way
+to ensure connectivity in a post-generation phase, since certain algorithms are likely to produce disconnected areas.
+  """
+  But the primary factor I pay attention to when tweaking map parameters is the number and density of loops.
+  By loops I mean places where multiple pathways reach the same destination. A map with few or no loops in its
+  layout will require lots of backtracking, and backtracking is not fun! Players may still choose to travel along
+  previous paths be it to gather items or escape an enemy, but taking the same route multiple times shouldn’t be
+  forced on them. Long paths that lead to dead ends had better at least contain treasure or access to a new area.
+  """
+  """
+  Testing a map for connectivity post generation is an important step in determining whether to use that map.
+  Some more complex procedural methods can build that requirement into the generation process itself
+  """
+  https://www.reddit.com/r/gamedev/comments/1dlwc4/procedural_dungeon_generation_algorithm_explained/
+- Content:
+    How we decide what to put where in these maps is another big issue.
+    Integrating prefab areas into the generation helps making the game more memorable.
+
+### Creating the map:
+The map is made up of tiles, with will contain data about if the tile is "walkable", "transparency" and how
+to render the tile to the screen.
+This is implemented by defining numpy dtypes for the tile characteristics and numpy array for the tile final definition
+
+The ord() function returns the number representing the unicode code of a specified character.
