@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import tcod
 
-from engine import Engine
-from entity import Entity
-from game_map import GameMap
-from input_handlers import EventHandler
+import game.engine
+import game.entity
+import game.game_map
+import game.input_handlers
 
 
 def main() -> None:
@@ -15,23 +15,22 @@ def main() -> None:
     map_height = 45
 
     tileset = tcod.tileset.load_tilesheet(
-        "dejavu16x16_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD
+        "data/dejavu16x16_gs_tc.png", 32, 8, tcod.tileset.CHARMAP_TCOD
     )
 
-    event_handler = EventHandler()
+    engine = game.engine.Engine()
+    engine.game_map = game.game_map.GameMap(engine, map_width, map_height)
+    engine.game_map.tiles[1:-1, 1:-1] = 1
+    engine.game_map.tiles[30:33, 22] = 0
+    engine.player = game.entity.Entity(engine.game_map, screen_width // 2, screen_height // 2, "@", (255, 255, 255))
 
-    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', (255, 255, 255))
-    npc = Entity(int(screen_width / 2), int(screen_height / 2 - 10), '@', (255, 255, 0))
-    # int() because python3 doesn't truncate division by default and tcod needs int
-    entities = {npc, player}
+    game.entity.Entity(engine.game_map, screen_width // 2 - 5, screen_height // 2, "@", (255, 255, 0))  # NPC
 
-    game_map = GameMap(map_width, map_height)
+    event_handler = game.input_handlers.EventHandler(engine)
 
-    engine = Engine(entities=entities, event_handler=event_handler, game_map=game_map, player=player)
-
-    with tcod.context.new_terminal(
-        screen_width,
-        screen_height,
+    with tcod.context.new(
+        columns=screen_width,
+        rows=screen_height,
         tileset=tileset,
         title="The Rogue @nt",
         vsync=True,
@@ -39,11 +38,12 @@ def main() -> None:
         root_console = tcod.Console(screen_width, screen_height, order="F")  # "F" changes the default numpy order [y,x]
 
         while True:  # Starts the game loop
-            engine.render(console=root_console, context=context)  # Draw, Updates and clean the screen
-
-            events = tcod.event.wait()
-
-            engine.handle_events(events)
+            root_console.clear()
+            event_handler.on_render(console=root_console)
+            context.present(root_console
+                            )
+            for event in tcod.event.wait():
+                event_handler = event_handler.handle_events(event)
 
 
 if __name__ == "__main__":

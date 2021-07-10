@@ -85,3 +85,26 @@ to render the tile to the screen.
 This is implemented by defining numpy dtypes for the tile characteristics and numpy array for the tile final definition
 
 The ord() function returns the number representing the unicode code of a specified character.
+
+------
+Adaptation to 2021 tutorial.
+File structure:
+ data folder with the png
+ game folder --> In there its a __init__.py file needed to define a Python package
+
+ ECS (Bob Nystrom - Is There More to Game Architecture than ECS  -- https://www.youtube.com/watch?v=JxI3Eu5DPwE)
+   Idea #1: Use components to represent capabilities /// Components
+   Idea #2: Define your own type where each instance represents a type /// Type Objects
+   Idea #3: When in doubt, try turning an operation into an object /// Command Objects
+
+   Comment Section ->
+     Other side benefits of separating out "actions" is you can serialize them for replay systems,
+     multiplayer, offline simulation - lots of stuff!
+
+ ---
+ PART 1 2021
+ ---
+ In main.py:
+   The for-loop waits for there to be events then iterates over all events until none are left.
+   This is an efficient way to handle events when the game doesn’t have real-time animations or mechanics.
+   If you have real-time effects then you should replace tcod.event.wait with tcod.event.get.
