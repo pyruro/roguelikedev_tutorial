@@ -1,6 +1,6 @@
 import numpy as np  # type: ignore
 from tcod.console import Console
-
+# type ignore close to the top of a file [skips] checking that file altogether for mypy
 import tile_types
 
 
