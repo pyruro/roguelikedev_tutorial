@@ -108,3 +108,8 @@ File structure:
    The for-loop waits for there to be events then iterates over all events until none are left.
    This is an efficient way to handle events when the game doesn’t have real-time animations or mechanics.
    If you have real-time effects then you should replace tcod.event.wait with tcod.event.get.
+
+Part 3
+------
+- Added variable to track the entrance of the dungeon to game_map.py
+- random numbers state stored in engine.py
