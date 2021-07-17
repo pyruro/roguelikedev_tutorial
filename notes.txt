@@ -85,3 +85,17 @@ to render the tile to the screen.
 This is implemented by defining numpy dtypes for the tile characteristics and numpy array for the tile final definition
 
 The ord() function returns the number representing the unicode code of a specified character.
+
+Week 3
+------
+Part 4 Field of view:
+
+np.select -> allows to conditionally draw the desired tiles based on a condlist.
+|= -- Bitwise or ---> The line self.game_map.explored |= self.game_map.visible sets the explored array to include everything in
+the visible array, plus whatever it already had. This means that any tile the player can see,
+the player has also “explored.”
+---
+Part 5 - Placing Enemies and kickung them harmlessly
+---
+Entities are better placed in the GameMap class. That way the map has access to them directly and we can preserve which
+entities are on which floors easily
